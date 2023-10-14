@@ -1,4 +1,6 @@
 import sys
+import time
+
 import requests
 import random
 import string
@@ -15,17 +17,84 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # 需要先配置环境变量，否则会提示导入同目录的包不存在
 sys.path.append('')
 
-# 添加返回值
-def register_web(url):
+# 获取临时邮箱
+def get_tempemail():
+    # 设置请求头
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36 Edg/93.0.961.44'
+    }
+    # 设置请求参数
+    # data = {
+    #     'mailbox': ''
+    # }
+    # 发起get请求
+    response = requests.post("https://web2.temp-mail.org/mailbox", headers=headers, verify=False)
+    # 获取响应的内容,解析json
+    resp = json.loads(response.text)
+    # print(resp["token"])
+    print("获取的临时邮箱地址："+resp["mailbox"])
+    return resp["token"],resp["mailbox"]
+
+# 获取邮件内容
+def get_email_content(token):
+    # 等待5秒
+    time.sleep(5)
+    # 设置请求头
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36 Edg/93.0.961.44',
+        "authorization" : "Bearer "+token
+        # "authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiMjYzNDFkNjViMDQwNDEyNWIzZmYxMzQ2NDkyMjU1NDAiLCJtYWlsYm94Ijoic29oZXlpZjMzMEBlbGl4aXJzZC5jb20iLCJpYXQiOjE2OTcyOTU4Mjl9.YlTsqR5nFsiQLhQUZzydABU0IvgiGLpyv96hA7MtVAE"
+    }
+    # 发起get请求
+    response = requests.get("https://web2.temp-mail.org/messages", headers=headers, verify=False)
+    # 获取响应的内容,解析json
+    resp = json.loads(response.text)
+    id = resp['messages'][0]['_id']
+    response = requests.get("https://web2.temp-mail.org/messages/"+id, headers=headers, verify=False)
+    body = json.loads(response.text)['bodyHtml']
+    # 获取body之后解析成HTML对象
+    obj_html = BeautifulSoup(body, 'html.parser')
+    # 获取验证码
+    body = obj_html.find('span', style="font-family: 'Nunito', Arial, Verdana, Tahoma, Geneva, sans-serif; color: #ffffff; font-size: 20px; line-height: 30px; text-decoration: none; white-space: nowrap; font-weight: 600;").text
+    print("获取的验证码为：" + body)
+    return body
+
+
+# 发送邮件验证码
+def send_email(url,email):
     # 随机获取8位数的字符串
     ran_str = ''.join(random.sample(string.ascii_letters + string.digits, 8))
     # 参数放在一个字典中
     data = {
-        'email': ran_str + '@163.com',
-        'name': ran_str,
-        'passwd': ran_str,
-        'repasswd': ran_str,
-        'code': 0
+        'email': email
+    }
+    # 设置请求头
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36 Edg/93.0.961.44'
+    }
+    # 发起post请求
+    response = requests.post(url+"/auth/send", data=data, headers=headers, verify=False)
+    # 获取响应的内容
+    resp = json.loads(response.text)
+    # 判断是否发送成功
+    if resp['ret'] == 1:
+        print('发送邮件成功')
+    else:
+        # 抛出异常结束程序
+        raise Exception('发送邮件失败，原因：' + resp['msg'])
+
+# 添加返回值
+def register_web(url,email,code):
+    # 截取邮箱前缀
+    mail_str = email.split("@")[0]
+    # 参数放在一个字典中
+    data = {
+        'email': email,
+        'name': mail_str,
+        'passwd': mail_str,
+        'repasswd': mail_str,
+        'code': 0,
+        'emailcode': code
     }
     # 设置请求头
     headers = {
@@ -36,19 +105,19 @@ def register_web(url):
     # 获取响应的内容
     resp = json.loads(response.text)
     if resp['ret'] == 1:
-        print('注册成功，账户为：', ran_str)
-        return ran_str
+        print('注册成功，账户为：', email)
+        return email
     else:
         # 抛出异常结束程序
         raise Exception('注册失败，原因：' + resp['msg'])
 
 
 # 添加返回值
-def login_web(url, ran_str):
+def login_web(url, email):
     # 参数放在一个字典中
     data = {
-        'email': ran_str + '@163.com',
-        'passwd': ran_str
+        'email': email,
+        'passwd': email.split("@")[0]
     }
     # 设置请求头
     headers = {
@@ -142,11 +211,16 @@ def close_v2ray():
         print(f"关闭V2RayN时出现错误: {e}")
 
 if __name__ == '__main__':
-    url = 'https://www.kakayun.lol'
-    path = 'E:\\v2rayN-Core\\'
-    ran_str = register_web(url)
-    cookies = login_web(url, ran_str)
-    checkin_web(url, cookies)
-    v2ray_url = get_v2ray_url(url, cookies)
-    write_config_file(path, v2ray_url)
+    url = 'https://applegame.xyz'
+    # url = 'https://vpiv.me' 不支持v2ray 但是支持ssr
+    token,email = get_tempemail()
+    send_email(url,email)
+    code = get_email_content(token)
+    email = register_web(url,email,code)
+    cookies = login_web(url,email)
+    checkin_web(url,cookies)
+    v2ray_url = get_v2ray_url(url,cookies)
+    print(v2ray_url)
+    # write_config_file('E:\\v2rayN-Core\\',v2ray_url)
     print('程序执行完毕')
+
