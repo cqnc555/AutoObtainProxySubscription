@@ -211,7 +211,7 @@ def close_v2ray():
         print(f"关闭V2RayN时出现错误: {e}")
 
 if __name__ == '__main__':
-    url = 'https://applegame.xyz'
+    url = 'https://www.paofu.cloud'
     # url = 'https://vpiv.me' 不支持v2ray 但是支持ssr
     token,email = get_tempemail()
     send_email(url,email)

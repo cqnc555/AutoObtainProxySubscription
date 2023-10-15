@@ -104,6 +104,7 @@ def get_v2ray_url(url, cookies):
     obj_html = BeautifulSoup(resp.text, 'html.parser')
     # 获取订阅地址
     v2ray_url = obj_html.find('a', class_='btn btn-icon icon-left btn-primary btn-v2ray copy-text btn-lg btn-round')['data-clipboard-text']
+    print('订阅地址：', v2ray_url)
     return v2ray_url
 
 # 写入配置文件
@@ -142,11 +143,13 @@ def close_v2ray():
         print(f"关闭V2RayN时出现错误: {e}")
 
 if __name__ == '__main__':
-    url = 'https://www.kakayun.lol'
+    # url = 'https://www.ytdy666.buzz' # 不支持v2ray 但是支持ssr
+    # url = 'https://www.kakayun.lol'
+    url = 'https://www.paofu.cloud'
     path = 'E:\\v2rayN-Core\\'
     ran_str = register_web(url)
     cookies = login_web(url, ran_str)
     checkin_web(url, cookies)
     v2ray_url = get_v2ray_url(url, cookies)
-    write_config_file(path, v2ray_url)
+    # write_config_file(path, v2ray_url)
     print('程序执行完毕')
