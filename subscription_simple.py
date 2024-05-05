@@ -1,4 +1,7 @@
 import sys
+sys.path.append('')
+import time
+import geetest_slide
 import requests
 import random
 import string
@@ -16,7 +19,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 sys.path.append('')
 
 # 添加返回值
-def register_web(url):
+def register_web(url,validate):
     # 随机获取8位数的字符串
     ran_str = ''.join(random.sample(string.ascii_letters + string.digits, 8))
     # 参数放在一个字典中
@@ -25,10 +28,15 @@ def register_web(url):
         'name': ran_str,
         'passwd': ran_str,
         'repasswd': ran_str,
-        'code': 0
+        'code': 0,
+        'geetest_challenge': validate['geetest_challenge'],
+        'geetest_validate': validate['geetest_validate'],
+        'geetest_seccode': validate['geetest_seccode']
+
     }
     # 设置请求头
     headers = {
+        'cookie': 'PHPSESSID=bp8279pj88sup3uum8b5q3tmde; lang=zh-cn',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36 Edg/93.0.961.44',
     }
     # 发起post请求
@@ -144,12 +152,17 @@ def close_v2ray():
 
 if __name__ == '__main__':
     # url = 'https://www.ytdy666.buzz' # 不支持v2ray 但是支持ssr
-    # url = 'https://www.kakayun.lol'
-    url = 'https://www.paofu.cloud'
-    path = 'E:\\v2rayN-Core\\'
-    ran_str = register_web(url)
+    # url = 'https://www.douluoyun.lol'
+    url = 'https://www.kakayun.homes'
+    # url = 'https://www.paofu.cloud'
+    # path = 'E:\\v2rayN-Core\\'
+    path = 'F:\\FQ\\v2rayN\\'
+    validate = geetest_slide.get_validate(url)
+    print(validate)
+    ran_str = register_web(url,validate)
     cookies = login_web(url, ran_str)
     checkin_web(url, cookies)
     v2ray_url = get_v2ray_url(url, cookies)
-    # write_config_file(path, v2ray_url)
+    write_config_file(path, v2ray_url)
     print('程序执行完毕')
+    time.sleep(10000)
