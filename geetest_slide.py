@@ -1103,7 +1103,7 @@ def step1():
     return response.text
 
 # 第一此请求，获取gt 和 challenge
-def step1_for_kakayun(url):
+def step1_for_proxyweb(url):
     values_map = {}
     content = requests.get(url,headers=head).text
     gt_index = content.find('gt: "')
@@ -1120,6 +1120,7 @@ def step1_for_kakayun(url):
         challenge_end = content.find('"', challenge_start)
         challenge_value = content[challenge_start:challenge_end]
         values_map["challenge"] = challenge_value
+    pprint("第一步请求{}网址，获得的参数为：{}".format(url,str(values_map)))
     return values_map
 
 # 根据第一个请求的返回值GT请求第二个链接(请求没啥用)
@@ -1129,7 +1130,7 @@ def  step2(gt):
         "callback":"geetest_"+str(int(time.time() * 100))
     }
     response = requests.get(url22,params=parm,headers=head)
-    print(response.text)
+    pprint("第二步请求{}网址，获得的响应为：{}".format(url22, response.text))
     return response.text
 
 # 根据第一个请求的返回值GT和challenge请求第三个链接拿到 C 和 S
@@ -1144,7 +1145,7 @@ def step3(gt,challenge):
         "callback": "geetest_" + str(int(time.time() * 100))
     }
     response = requests.get(url5,params=parm,headers=head)
-    print(response.text)
+    pprint("第三步请求{}网址，获得的响应为：{}".format(url5, response.text))
     return response.text
 
 # 根据第一个请求的返回值GT和challenge请求第四个链接，好像也没啥用
@@ -1159,7 +1160,7 @@ def step4(gt,challenge):
         "callback": "geetest_" + str(int(time.time() * 100))
     }
     response = requests.get(url44,params=parm,headers=head)
-    print(response.text)
+    pprint("第四步请求{}网址，获得的响应为：{}".format(url44, response.text))
     return response.text
 
 # 根据第一个请求的返回值GT和challenge请求第五个链接，拿到图片信息 和 新的challenge（比原先的challenge多2位）
@@ -1181,25 +1182,10 @@ def step5(gt,challenge):
         "callback": "geetest_" + str(int(time.time() * 100))
     }
     response = requests.get(url55,params=parm,headers=head)
-    # print(response.text)
+    pprint("第五步请求{}网址，获得的响应为：{}".format(url55, response.text))
     return response.text
 
 # 根据第一个请求的返回值GT和challenge请求第四个链接，好像也没啥用
-def step6(gt,challenge,w):
-    parm = {
-        "gt": gt,
-        "challenge": challenge,
-        "lang": "zh-cn",
-        "$_BCN": 0,
-        "client_type": "web",
-        "w": w,
-        "callback": "geetest_" + str(int(time.time() * 100))
-    }
-    response = requests.get(url4,params=parm,headers=head)
-    # print(response.text)
-    return response.text
-
-
 def step6(gt, challenge, w):
     parm = {
      "gt": gt,
@@ -1211,6 +1197,7 @@ def step6(gt, challenge, w):
      "callback": "geetest_" + str(int(time.time() * 100))
     }
     response = requests.get(url44, params=parm, headers=head)
+    pprint("第六步请求{}网址，获得的响应为：{}".format(url55, response.text))
     # print(response.text)
     return response.text
 
@@ -1301,9 +1288,9 @@ def delete_files_in_directory(directory = "./img"):
    file_path = os.path.join(root, file)
    os.remove(file_path)
 
+# 获取轨迹数组
 def find_array_starting_with_number(two_dim_array, target_number):
     result = []
-
     for array in two_dim_array:
      result.append(array)
      if array[0] == target_number:
@@ -1311,8 +1298,7 @@ def find_array_starting_with_number(two_dim_array, target_number):
     return result
 
 def get_validate(url = "https://www.kakayun.homes"):
-    step1Json = step1_for_kakayun(url + "/auth/register")
-    print(step1Json)
+    step1Json = step1_for_proxyweb(url + "/auth/register")
     # 根据第一个请求的返回值GT请求第二个链接(请求没啥用) 请求了一些js文件
     step2Response = step2(step1Json["gt"])
     step2Json = handle_response_to_json(step2Response)
@@ -1340,23 +1326,27 @@ def get_validate(url = "https://www.kakayun.homes"):
     track = find_array_starting_with_number(slide_track, distance)
     print("轨迹为" + str(track))
     passtime = track[-1][-1]
+    print("使用时间为" + str(track))
     # w = get_slide_w(step5Json["gt"], step5Json["challenge"], step5Json["s"], distance, track)
     # pprint(step5Json)
     w = get_geetest_w_js_call(step5Json["gt"], step5Json["challenge"], step5Json["c"], step5Json["s"], distance,
                               passtime, track)
-    # 根据第一个请求的返回值GT和challenge请求第四个链接
+    print("计算得到的w值为" + w)
+    # 根据轨迹暂停几秒钟
     time.sleep(passtime / 1000)
+    # 请求获取检验结果
     step6Response = step6(step5Json["gt"], step5Json["challenge"], w)
     step6Json = handle_response_to_json(step6Response)
     if (step6Json['message'] != 'success'):
-        print("获取校验失败")
+        print("校验失败，准备重新校验")
+        # 如果校验失败重新校验
         get_validate(url)
     delete_files_in_directory()
     validate_value = {}
     validate_value['geetest_challenge'] = step5Json["challenge"]
     validate_value['geetest_validate'] = step6Json['validate']
     validate_value['geetest_seccode'] = step6Json['validate'] + ' | jordan'
-    print(validate_value)
+    print('校验成功，校验结果为：' + validate_value)
     return validate_value
 
 
@@ -1366,7 +1356,7 @@ if __name__ == '__main__':
     # step1Json = json.loads(step1())
     # print(step1Json)
     url = "https://www.douluoyun.lol"
-    step1Json = step1_for_kakayun(url+"/auth/register")
+    step1Json = step1_for_proxyweb(url+"/auth/register")
     # 根据第一个请求的返回值GT请求第二个链接(请求没啥用) 请求了一些js文件
     step2Response = step2(step1Json["gt"])
     step2Json = handle_response_to_json(step2Response)
