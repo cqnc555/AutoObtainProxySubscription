@@ -1104,7 +1104,9 @@ def step1():
 # 第一此请求，获取gt 和 challenge
 def step1_for_proxyweb(url):
     values_map = {}
-    content = requests.get(url,headers=head).text
+    response = requests.get(url,headers=head)
+    values_map['set-cookie'] = response.headers['set-cookie']
+    content = response.text
     gt_index = content.find('gt: "')
     if gt_index != -1:
         gt_start = gt_index + len('gt: "')
@@ -1325,7 +1327,7 @@ def get_validate(url = "https://www.kakayun.homes"):
     track = find_array_starting_with_number(slide_track, distance)
     print("轨迹为" + str(track))
     passtime = track[-1][-1]
-    print("使用时间为" + str(track))
+    print("使用时间为" + str(passtime))
     # w = get_slide_w(step5Json["gt"], step5Json["challenge"], step5Json["s"], distance, track)
     # pprint(step5Json)
     w = get_geetest_w_js_call(step5Json["gt"], step5Json["challenge"], step5Json["c"], step5Json["s"], distance,
@@ -1345,6 +1347,7 @@ def get_validate(url = "https://www.kakayun.homes"):
     validate_value['geetest_challenge'] = step5Json["challenge"]
     validate_value['geetest_validate'] = step6Json['validate']
     validate_value['geetest_seccode'] = step6Json['validate'] + ' | jordan'
+    validate_value['set-cookie'] = step1Json['set-cookie']
     print('校验成功，校验结果为：' + str(validate_value))
     return validate_value
 

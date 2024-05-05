@@ -36,7 +36,7 @@ def register_web(url,validate):
     }
     # 设置请求头 新版新增cookie，以防失败
     headers = {
-        'cookie': 'PHPSESSID=7dabr4oaajjod3eubftmfc183p; lang=zh-cn',
+        'cookie': validate['set-cookie'],
         # 'cookie': 'Cookie: GeeTestUser=0b273d6d8c36d658f33b8b35fb3b93c2',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36 Edg/93.0.961.44',
     }
