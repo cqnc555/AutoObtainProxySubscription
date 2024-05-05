@@ -1,5 +1,4 @@
 import time
-import random
 from pprint import pprint
 
 import cv2
@@ -1346,7 +1345,7 @@ def get_validate(url = "https://www.kakayun.homes"):
     validate_value['geetest_challenge'] = step5Json["challenge"]
     validate_value['geetest_validate'] = step6Json['validate']
     validate_value['geetest_seccode'] = step6Json['validate'] + ' | jordan'
-    print('校验成功，校验结果为：' + validate_value)
+    print('校验成功，校验结果为：' + str(validate_value))
     return validate_value
 
 

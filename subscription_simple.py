@@ -36,7 +36,8 @@ def register_web(url,validate):
     }
     # 设置请求头 新版新增cookie，以防失败
     headers = {
-        'cookie': 'PHPSESSID=bp8279pj88sup3uum8b5q3tmde; lang=zh-cn',
+        'cookie': 'PHPSESSID=7dabr4oaajjod3eubftmfc183p; lang=zh-cn',
+        # 'cookie': 'Cookie: GeeTestUser=0b273d6d8c36d658f33b8b35fb3b93c2',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36 Edg/93.0.961.44',
     }
     # 发起post请求
@@ -115,6 +116,11 @@ def get_v2ray_url(url, cookies):
     print('订阅地址：', v2ray_url)
     return v2ray_url
 
+def read_config():
+    with open("config.json", "r") as f:
+        config = json.load(f)
+        return config
+
 # 写入配置文件
 def write_config_file(path,v2ray_url):
     # 关闭v2rayN
@@ -153,10 +159,14 @@ def close_v2ray():
 if __name__ == '__main__':
     # url = 'https://www.ytdy666.buzz' # 不支持v2ray 但是支持ssr
     # url = 'https://www.douluoyun.lol'
-    url = 'https://www.kakayun.homes'
+    # url = 'https://www.kakayun.homes'
     # url = 'https://www.paofu.cloud'
     # path = 'E:\\v2rayN-Core\\'
-    path = 'F:\\FQ\\v2rayN\\'
+    # path = 'F:\\FQ\\v2rayN\\'
+
+    config = read_config()
+    url = config['url']
+    path = config['path']
     validate = geetest_slide.get_validate(url)
     ran_str = register_web(url,validate)
     cookies = login_web(url, ran_str)
