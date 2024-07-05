@@ -1,6 +1,8 @@
 import sys
-sys.path.append('')
 import time
+
+sys.path.append('')
+import os
 import geetest_slide
 import requests
 import random
@@ -134,6 +136,8 @@ def write_config_file(path,v2ray_url):
     jsonobj = json.dumps(data)
     f.write(jsonobj)
     f.close()
+    print("等待5分钟后启动V2ray")
+    time.sleep(180)
     start_v2ray(path)
 
 def start_v2ray(path):
@@ -156,6 +160,22 @@ def close_v2ray():
     except Exception as e:
         print(f"关闭V2RayN时出现错误: {e}")
 
+
+def get_v2ray_suburl(v2ray_url):
+    # 发起get请求
+    resp = requests.get(v2ray_url, verify=False)
+    print(resp.text)
+    current_directory =''
+    if getattr(sys, 'frozen', False):
+        # 如果是打包后的exe文件，使用sys._MEIPASS获取打包时的临时路径
+        current_directory = os.path.dirname(sys.executable)
+    else:
+        # 如果是脚本文件，使用__file__获取脚本所在路径
+        current_directory = os.path.dirname(__file__)
+    with open(current_directory+"/v2ray_url.txt", "w", encoding="utf-8") as file:
+        file.write(resp.text)
+
+
 if __name__ == '__main__':
     # url = 'https://www.ytdy666.buzz' # 不支持v2ray 但是支持ssr
     # url = 'https://www.douluoyun.lol'
@@ -163,7 +183,7 @@ if __name__ == '__main__':
     # url = 'https://www.paofu.cloud'
     # path = 'E:\\v2rayN-Core\\'
     # path = 'F:\\FQ\\v2rayN\\'
-
+    # v2ray_url = 'https://dingy.kakayunkakak.store/link/Ta6Wh50631GV3WZD?sub=3'
     config = read_config()
     url = config['url']
     path = config['path']
@@ -173,5 +193,6 @@ if __name__ == '__main__':
     checkin_web(url, cookies)
     v2ray_url = get_v2ray_url(url, cookies)
     write_config_file(path, v2ray_url)
-    print('程序执行完毕')
+    get_v2ray_suburl(v2ray_url)
+    print('程序执行完毕，15S后自动结束本程序。')
     time.sleep(15)
