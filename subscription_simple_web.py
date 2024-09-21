@@ -14,8 +14,6 @@ from bs4 import BeautifulSoup
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# 设置Chrome的环境变量（也可以直接指定路径）
-
 def get_proxy(url):
     resp = requests.get(url, verify=False)
     soup = BeautifulSoup(resp.content, "html.parser")
@@ -26,7 +24,6 @@ def get_proxy(url):
         if content.text.startswith("ss://"):
             proxy_list= content.text.split('\n')
     return proxy_list
-
 
 def handle_proxy_list(proxy_list):
     pattern = r"ss://(.*?)@(.*?)#(.*)"
@@ -122,13 +119,4 @@ if __name__ == '__main__':
     path = 'F:\\FQ\\v2rayN\\'
     proxy_list = get_proxy(url)
     new_proxy_list = handle_proxy_list(proxy_list)
-    print(new_proxy_list)
-
-    # ran_str = register_web(url,validate)
-    # cookies = login_web(url, ran_str)
-    # checkin_web(url, cookies)
-    # v2ray_url = get_v2ray_url(url, cookies)
     write_config_file(path, new_proxy_list)
-    # get_v2ray_suburl(v2ray_url)
-    # print('程序执行完毕，15S后自动结束本程序。')
-    # time.sleep(15)
