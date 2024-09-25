@@ -16,14 +16,18 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 def get_proxy(url):
     resp = requests.get(url, verify=False)
-    soup = BeautifulSoup(resp.content, "html.parser")
-    contents = soup.find_all('code')
+    # soup = BeautifulSoup(resp.content, "html.parser")
+    # contents = soup.find_all('code')
+    resp_text = resp.text
+    pattern = r"ss://[^\s]+"
+    ss_links = re.findall(pattern, resp_text)
+
     # print(contents)
-    proxy_list = []
-    for content in contents:
-        if content.text.startswith("ss://"):
-            proxy_list= content.text.split('\n')
-    return proxy_list
+    # proxy_list = []
+    # for content in ss_links:
+    #     if content.startswith("ss://"):
+    #         proxy_list= content.text.split('\n')
+    return ss_links
 
 def handle_proxy_list(proxy_list):
     pattern = r"ss://(.*?)@(.*?)#(.*)"
@@ -114,7 +118,7 @@ def write_config_file(path, new_proxy_list):
 if __name__ == '__main__':
     # url = 'https://github.com/abshare/abshare.github.io'
     # url = 'https://ablnk.absslk.xyz/zI3RCuq'
-    url = 'https://abshare.github.io/'
+    url = 'https://hub.gitmirror.com/https://raw.githubusercontent.com/abshare/abshare.github.io/main/README.md'
     # path = 'E:\\v2rayN-Core\\'
     path = 'F:\\FQ\\v2rayN\\'
     proxy_list = get_proxy(url)

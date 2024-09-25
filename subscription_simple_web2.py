@@ -91,6 +91,7 @@ def write_config_file(path, new_proxy_list):
         new_proxy_dict['alpn'] = ''
         new_proxy_list2.append(new_proxy_dict)
     data['vmess'] = new_proxy_list2
+    print(new_proxy_list2)
     f = open(path+"guiNConfig.json", 'w', encoding='UTF-8')
     # 字典转为字符串
     jsonobj = json.dumps(data)
@@ -102,8 +103,8 @@ def write_config_file(path, new_proxy_list):
 
 if __name__ == '__main__':
     # url = 'https://github.com/abshare/abshare.github.io'
-    # url = 'https://ablnk.absslk.xyz/zI3RCuq'
-    url = 'https://freemc.mcsslk.xyz/Jjk3lTM'
+    url = 'https://freemc.mcsslk.xyz/SVpFKXE'
+    # url = 'https://freemc.mcsslk.xyz/Jjk3lTM'
     # url = 'https://abshare.github.io/'
     # path = 'E:\\v2rayN-Core\\'
     path = 'F:\\FQ\\v2rayN\\'
