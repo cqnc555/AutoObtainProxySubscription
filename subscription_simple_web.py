@@ -8,7 +8,6 @@ import urllib.parse
 import requests
 import json
 import subprocess
-from bs4 import BeautifulSoup
 
 # 禁用安全请求警告
 import urllib3
@@ -16,17 +15,10 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 def get_proxy(url):
     resp = requests.get(url, verify=False)
-    # soup = BeautifulSoup(resp.content, "html.parser")
-    # contents = soup.find_all('code')
     resp_text = resp.text
     pattern = r"ss://[^\s]+"
     ss_links = re.findall(pattern, resp_text)
 
-    # print(contents)
-    # proxy_list = []
-    # for content in ss_links:
-    #     if content.startswith("ss://"):
-    #         proxy_list= content.text.split('\n')
     return ss_links
 
 def handle_proxy_list(proxy_list):
@@ -54,6 +46,11 @@ def handle_proxy_list(proxy_list):
         else:
             print("匹配失败")
     return new_proxy_list
+
+def read_config():
+    with open("config.json", "r") as f:
+        config = json.load(f)
+        return config
 
 def close_v2ray():
     try:
@@ -118,9 +115,12 @@ def write_config_file(path, new_proxy_list):
 if __name__ == '__main__':
     # url = 'https://github.com/abshare/abshare.github.io'
     # url = 'https://ablnk.absslk.xyz/zI3RCuq'
-    url = 'https://hub.gitmirror.com/https://raw.githubusercontent.com/abshare/abshare.github.io/main/README.md'
+    # url = 'https://hub.gitmirror.com/https://raw.githubusercontent.com/abshare/abshare.github.io/main/README.md'
     # path = 'E:\\v2rayN-Core\\'
-    path = 'F:\\FQ\\v2rayN\\'
+    # path = 'F:\\FQ\\v2rayN\\'
+    config = read_config()
+    url = config['url']
+    path = config['path']
     proxy_list = get_proxy(url)
     new_proxy_list = handle_proxy_list(proxy_list)
     write_config_file(path, new_proxy_list)
