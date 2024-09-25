@@ -46,7 +46,7 @@ def handle_proxy_list(proxy_list):
             d_note = urllib.parse.unquote(note)
             proxy_dict = {}
             proxy_dict['d_pass_word'] = d_pass_word
-            print(d_pass_word)
+            # print(d_pass_word)
             proxy_dict['d_url'] = d_url
             proxy_dict['d_prot'] = d_prot
             proxy_dict['d_note'] = d_note
