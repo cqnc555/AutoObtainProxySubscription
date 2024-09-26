@@ -114,12 +114,14 @@ def write_config_file(path, new_proxy_list):
 
 if __name__ == '__main__':
     # url = 'https://github.com/abshare/abshare.github.io'
+    # url = 'https://github.com/mksshare/mksshare.github.io'
     # url = 'https://ablnk.absslk.xyz/zI3RCuq'
     # url = 'https://hub.gitmirror.com/https://raw.githubusercontent.com/abshare/abshare.github.io/main/README.md'
+    # url = 'https://hub.gitmirror.com/https://raw.githubusercontent.com/mksshare/mksshare.github.io/main/README.md'
     # path = 'E:\\v2rayN-Core\\'
     # path = 'F:\\FQ\\v2rayN\\'
     config = read_config()
-    url = config['url']
+    url = config['url_direct']
     path = config['path']
     proxy_list = get_proxy(url)
     new_proxy_list = handle_proxy_list(proxy_list)
