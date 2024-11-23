@@ -31,19 +31,30 @@ def get_proxy_url(url):
     resp = markdown.markdown(resp)
     soup = BeautifulSoup(resp, 'html.parser')
     # 3. 查找目标 div
-    snippet_div = soup.find('div', class_='snippet-clipboard-content')
-    if snippet_div:
-        # 4. 获取 data-snippet-clipboard-copy-content 属性的值
-        # clipboard_content = snippet_div.get('data-snippet-clipboard-copy-content')
+    # snippet_div = soup.findAll('<p><code>', class_='snippet-clipboard-content')
+    # 查找所有引用块（blockquote）
+    blockquote = soup.find_all('p')
 
-        # 5. 获取 <code> 中的文本
-        code_content = snippet_div.find('code').text.strip()
+    # 遍历每个引用块，查找其中的链接
+    for block in blockquote:
+        link = block.find('code')  # 查找引用中的链接
+        if link:
+            print("找到的订阅地址地址:", link.contents[0])
+            resp = requests.get(link.contents[0], headers=headers)
+            return resp.text
 
-        # print("Data-snippet-clipboard-copy-content:", clipboard_content)
-        print("Code content:", code_content)
-
-        resp = requests.get(code_content, headers=headers)
-        return resp.text
+    # if snippet_div:
+    #     # 4. 获取 data-snippet-clipboard-copy-content 属性的值
+    #     # clipboard_content = snippet_div.get('data-snippet-clipboard-copy-content')
+    #
+    #     # 5. 获取 <code> 中的文本
+    #     code_content = snippet_div[0].find('code').text.strip()
+    #
+    #     # print("Data-snippet-clipboard-copy-content:", clipboard_content)
+    #     print("Code content:", code_content)
+    #
+    #     resp = requests.get(code_content, headers=headers)
+    #     return resp.text
     else:
         print("未找到指定的 div.")
 
@@ -152,14 +163,22 @@ def write_config_file(path, new_proxy_list):
     start_v2ray(path)
     pass
 
+def read_config():
+    with open("config.json", "r") as f:
+        config = json.load(f)
+        return config
 
 if __name__ == '__main__':
     # url = 'https://github.com/abshare/abshare.github.io'
-    url = 'https://g.nite07.org/mksshare/mksshare.github.io/blob/main/README.md'
+    # url = 'https://g.nite07.org/mksshare/mksshare.github.io/blob/main/README.md'
+    url = 'https://hub.gitmirror.com/https://raw.githubusercontent.com/mksshare/mksshare.github.io/main/README.md'
     # url = 'https://freemc.mcsslk.xyz/Jjk3lTM'
     # url = 'https://abshare.github.io/'
     # path = 'E:\\v2rayN-Core\\'
-    path = 'F:\\FQ\\v2rayN\\'
+    # path = 'F:\\FQ\\v2rayN\\'
+    config = read_config()
+    # url = config['url_direct']
+    path = config['path']
     proxy_base64 = get_proxy_url(url)
     base_proxy_list = handle_proxy_base64url(proxy_base64)
     new_proxy_list = handle_proxy_list(base_proxy_list)
