@@ -114,7 +114,7 @@ def read_config():
         return config
 
 if __name__ == '__main__':
-    # url = 'https://github.com/abshare/abshare.github.io'
+    # url = 'https://https://gitclone.com/github.com/abshare/abshare.github.io'
     # url = 'https://g.nite07.org/mksshare/mksshare.github.io/blob/main/README.md'
     # url = 'https://hub.gitmirror.com/https://raw.githubusercontent.com/mksshare/mksshare.github.io/main/README.md'
     # url = 'https://freemc.mcsslk.xyz/Jjk3lTM'
