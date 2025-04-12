@@ -1,14 +1,15 @@
 import sys
 import time
-
 sys.path.append('')
+
+import handle_v2ray
+
 import os
 import geetest_slide
 import requests
 import random
 import string
 import json
-import subprocess
 from bs4 import BeautifulSoup
 
 # 禁用安全请求警告
@@ -126,7 +127,6 @@ def read_config():
 # 写入配置文件
 def write_config_file(path,v2ray_url):
     # 关闭v2rayN
-    close_v2ray()
     # 读取JSON文件
     f = open(path+"guiNConfig.json", "r", encoding="UTF-8")
     data = json.loads(f.read())
@@ -136,29 +136,11 @@ def write_config_file(path,v2ray_url):
     jsonobj = json.dumps(data)
     f.write(jsonobj)
     f.close()
-    print("等待5分钟后启动V2ray")
+    print("等待3分钟后启动V2ray")
     time.sleep(180)
-    start_v2ray(path)
-
-def start_v2ray(path):
-    try:
-        # 替换成实际启动V2Ray的命令，这里只是一个示例
-        # 假设V2Ray的可执行文件位于 /path/to/v2ray
-        # 你可能需要根据实际情况修改启动命令  popen代替run方法，可以后台运行软件与当前py线程无关
-        subprocess.Popen([path+'v2rayN.exe'])
-        print("V2Ray 已成功启动")
-    except Exception as e:
-        print(f"启动V2Ray时出现错误: {e}")
-
-def close_v2ray():
-    try:
-        # 替换成实际关闭V2RayN的命令，这里假设使用taskkill命令
-        # taskkill是Windows上用于终止进程的命令
-        # /IM参数指定要终止的进程名，这里假设V2RayN的进程名为v2rayN.exe
-        subprocess.run(['taskkill', '/IM', 'v2rayN.exe', '/F'])
-        print("V2RayN 已成功关闭")
-    except Exception as e:
-        print(f"关闭V2RayN时出现错误: {e}")
+    handle_v2ray.close_v2ray()
+    time.sleep(5)
+    handle_v2ray.start_v2ray(path)
 
 
 def get_v2ray_suburl(v2ray_url):
