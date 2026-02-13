@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>轨迹捕获测试</title>
+    <style>
+        /* 让页面更清晰一点 */
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        /* 这是我们的 "滑块按钮" */
+        #slider-button {
+            width: 50px;
+            height: 50px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 50%; /* 圆形按钮 */
+            cursor: pointer;
+            position: absolute; /* 允许它被拖动 */
+            left: 20px;
+            top: 100px;
+            text-align: center;
+            line-height: 50px;
+            user-select: none; /* 防止拖动时选中文本 */
+        }
+    </style>
+</head>
+<body>
+
+    <h2>JavaScript 轨迹捕获演示</h2>
+    <p>请按住下面的蓝色圆圈，随意拖动它，然后松开鼠标。</p>
+    <p><b>重要：</b>请先按 F12 打开浏览器的“开发者工具”，并切换到“控制台”(Console) 标签页，才能看到输出的轨迹数据。</p>
+
+    <div id="slider-button">拖我</div>
+
+    <script>
+        // 1. 获取那个 "滑块按钮"
+        // 注意：我把你的'getElementById'改成了 'document.getElementById'，这是正确的写法
+        const sliderButton = document.getElementById('slider-button');
+
+        let isDragging = false;
+        let trajectory = []; // 用来存储轨迹数据的数组
+        let startTime = 0;
+
+        // 2. 鼠标按下：开始记录
+        sliderButton.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startTime = Date.now(); // 记录开始时间
+            trajectory = []; // 清空之前的轨迹
+            console.log("开始记录轨迹...");
+
+            // 记录轨迹点
+            trajectory.push({
+                x: e.clientX,       // 鼠标的X坐标
+                y: e.clientY,       // 鼠标的Y坐标
+                t: Date.now() - startTime // 距离开始的时间差
+            });
+
+            // (可选) 只是为了让拖动更平滑
+            e.preventDefault();
+        });
+
+        // 3. 鼠标移动：记录移动中的每一点
+        // 注意：这里监听的是 'document'，而不是 'sliderButton'
+        // 这样即使鼠标拖得太快，移出了按钮范围，也能继续跟踪
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) {
+                return;
+            }
+
+            // (可选) 实时移动按钮，提供视觉反馈
+            sliderButton.style.left = e.clientX - 25 + 'px'; // 25是按钮宽度的一半
+            sliderButton.style.top = e.clientY - 25 + 'px'; // 25是按钮高度的一半
+
+            // 记录轨迹点
+            trajectory.push({
+                x: e.clientX,
+                y: e.clientY,
+                t: Date.now() - startTime
+            });
+        });
+
+        // 4. 鼠标松开：停止记录
+        // 同样监听 'document'，确保在任何地方松开都能停止
+        document.addEventListener('mouseup', (e) => {
+            if (!isDragging) {
+                return;
+            }
+            isDragging = false;
+
+            // 记录最后一个点
+            trajectory.push({
+                x: e.clientX,
+                y: e.clientY,
+                t: Date.now() - startTime
+            });
+
+            // 此时 "trajectory" 数组就包含了完整的操作轨迹
+            console.log('--- 轨迹数据 (捕获完毕) ---');
+            console.log(trajectory);
+
+            // 提醒用户
+            alert('轨迹捕获完毕！请在控制台 (F12) 查看数据。');
+        });
+    </script>
+
+</body>
+</html>
