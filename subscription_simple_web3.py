@@ -109,7 +109,7 @@ def handle_proxy_list(proxy_list):
 
 
 def read_config():
-    with open("config.json", "r") as f:
+    with open("./config.json", "r") as f:
         config = json.load(f)
         return config
 

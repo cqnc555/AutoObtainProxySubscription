@@ -73,7 +73,8 @@ def send_email(url,email):
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36 Edg/93.0.961.44'
     }
     # 发起post请求
-    response = requests.post(url+"/auth/send", data=data, headers=headers, verify=False)
+    response = requests.post(url+"/api/v1/passport/comm/sendEmailVerify", data=data, headers=headers, verify=False)
+    # response = requests.post(url+"/auth/send", data=data, headers=headers, verify=False)
     # 获取响应的内容
     resp = json.loads(response.text)
     # 判断是否发送成功
@@ -214,14 +215,15 @@ if __name__ == '__main__':
     url = 'https://portal.taronet.uk'
     # url = 'https://www.paofu.cloud'
     # url = 'https://vpiv.me' 不支持v2ray 但是支持ssr
-    token,email = get_tempemail()
+    # token,email = get_tempemail()
+    email = 'dinak83310@finfave.com'
     send_email(url,email)
-    code = get_email_content(token)
-    email = register_web(url,email,code)
-    cookies = login_web(url,email)
-    checkin_web(url,cookies)
-    v2ray_url = get_v2ray_url(url,cookies)
-    print(v2ray_url)
+    # code = get_email_content(token)
+    # email = register_web(url,email,code)
+    # cookies = login_web(url,email)
+    # checkin_web(url,cookies)
+    # v2ray_url = get_v2ray_url(url,cookies)
+    # print(v2ray_url)
     # write_config_file('E:\\v2rayN-Core\\',v2ray_url)
     print('程序执行完毕')
 
